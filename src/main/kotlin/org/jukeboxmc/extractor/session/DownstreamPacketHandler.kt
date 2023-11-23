@@ -125,7 +125,13 @@ class DownstreamPacketHandler(private val dataExtractor: DataExtractor) : Bedroc
                 blockStateBase64 = ExtractionUtil.nbtToBase64((content.blockDefinition as NbtBlockDefinitionRegistry.NbtBlockDefinition).nbtTag)
             }
 
-            creativeItems.add(CreativeItem(content.definition.identifier, nbtBase64, blockStateBase64))
+            var damage: Int? = content.damage
+
+            if (damage == 0) {
+                damage = null
+            }
+
+            creativeItems.add(CreativeItem(content.definition.identifier, damage, nbtBase64, blockStateBase64))
         }
 
         ExtractionUtil.writeJson(this.dataExtractor.gson().toJson(CreativeContents(creativeItems)), File("src/main/resources/extracted/creative_items/creative_items.${this.dataExtractor.codec().minecraftVersion.replace(".", "_")}.json"))
@@ -145,5 +151,5 @@ class DownstreamPacketHandler(private val dataExtractor: DataExtractor) : Bedroc
 
     data class CreativeContents(val items: List<CreativeItem>)
 
-    data class CreativeItem(val id: String, @SerializedName("nbt_b64") val nbtBase64: String?, @SerializedName("block_state_b64") val blockStateBase64: String?)
+    data class CreativeItem(val id: String, val damage: Int?, @SerializedName("nbt_b64") val nbtBase64: String?, @SerializedName("block_state_b64") val blockStateBase64: String?)
 }
