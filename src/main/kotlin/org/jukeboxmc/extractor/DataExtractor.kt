@@ -105,6 +105,14 @@ class DataExtractor {
             println("Authentication with the specified refresh token was successful")
         }
 
+        val stream = this.javaClass.classLoader.getResourceAsStream("block_palette.nbt")
+
+        if (stream == null) {
+            println("could not find block palette resource")
+
+            return
+        }
+
         this.javaClass.classLoader.getResourceAsStream("block_palette.nbt").use { inputStream ->
             GZIPInputStream(inputStream).use { gzipStream ->
                 DataInputStream(gzipStream).use {
@@ -185,7 +193,7 @@ class DataExtractor {
     fun clientSession(): ProxiedBedrockClientSession = this.clientSession!!
     fun serverSession(): ProxiedBedrockServerSession = this.serverSession!!
     fun msaAuth(): MsaAuth = this.msaAuth
-    fun legacyItemIds() : MutableMap<Int, String> = this.legacyItemIds
+    fun legacyItemIds(): MutableMap<Int, String> = this.legacyItemIds
 
     private fun createClient() {
         this.client = Bootstrap()
