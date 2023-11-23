@@ -27,16 +27,16 @@ class NbtBlockDefinitionRegistry(definitions: List<NbtMap>, hashed: Boolean) : D
         }
     }
 
-    override fun getDefinition(runtimeId: Int): BlockDefinition? {
-        if (!this.definitions.containsKey(runtimeId)){
-            return null
-        }
-
-       return this.definitions[runtimeId] as BlockDefinition
+    fun add(definition: NbtBlockDefinition) {
+        this.definitions[definition.runtimeId] = definition
     }
 
-    override fun isRegistered(definition: BlockDefinition?): Boolean =
-        this.definitions[definition?.runtimeId] == (definition ?: false)
+    override fun getDefinition(runtimeId: Int): BlockDefinition {
+        return this.definitions[runtimeId] as BlockDefinition
+    }
+
+    override fun isRegistered(definition: BlockDefinition): Boolean =
+        this.definitions[definition.runtimeId] == definition
 
     data class NbtBlockDefinition(val rId: Int, val nbtTag: NbtMap) : BlockDefinition {
         override fun getRuntimeId(): Int {

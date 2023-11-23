@@ -6,7 +6,9 @@ package org.jukeboxmc.extractor.session
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.nimbusds.jwt.SignedJWT
+import org.cloudburstmc.nbt.NbtMap
 import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition
+import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition
 import org.cloudburstmc.protocol.bedrock.packet.*
 import org.cloudburstmc.protocol.bedrock.util.EncryptionUtils
 import org.cloudburstmc.protocol.common.PacketSignal
@@ -74,11 +76,19 @@ class DownstreamPacketHandler(private val dataExtractor: DataExtractor) : Bedroc
     }
 
     override fun handle(packet: StartGamePacket): PacketSignal {
-        this.dataExtractor.clientSession().peer.codecHelper.itemDefinitions = SimpleDefinitionRegistry.builder<ItemDefinition>()
+        val itemDefinitionRegistry = SimpleDefinitionRegistry.builder<ItemDefinition>()
             .addAll(packet.itemDefinitions)
+            .add(SimpleItemDefinition("minecraft:empty", 0, false))
             .build()
 
-        this.dataExtractor.clientSession().peer.codecHelper.blockDefinitions = if (packet.isBlockNetworkIdsHashed) this.dataExtractor.blockDefinitionHashedRegistry() else this.dataExtractor.blockDefinitionRegistry()
+        this.dataExtractor.clientSession().peer.codecHelper.itemDefinitions = itemDefinitionRegistry
+        this.dataExtractor.serverSession().peer.codecHelper.itemDefinitions = itemDefinitionRegistry
+
+        val blockDefinitionRegistry = if (packet.isBlockNetworkIdsHashed) this.dataExtractor.blockDefinitionHashedRegistry() else this.dataExtractor.blockDefinitionRegistry()
+        blockDefinitionRegistry.add(NbtBlockDefinitionRegistry.NbtBlockDefinition(0, NbtMap.EMPTY))
+
+        this.dataExtractor.clientSession().peer.codecHelper.blockDefinitions = blockDefinitionRegistry
+        this.dataExtractor.serverSession().peer.codecHelper.blockDefinitions = blockDefinitionRegistry
 
         println("blockNetworkIdsHashed: ${packet.isBlockNetworkIdsHashed}")
 
@@ -121,8 +131,22 @@ class DownstreamPacketHandler(private val dataExtractor: DataExtractor) : Bedroc
                 nbtBase64 = ExtractionUtil.nbtToBase64(content.tag!!)
             }
 
-            if (content.blockDefinition != null && content.blockDefinition is NbtBlockDefinitionRegistry.NbtBlockDefinition) {
-                blockStateBase64 = ExtractionUtil.nbtToBase64((content.blockDefinition as NbtBlockDefinitionRegistry.NbtBlockDefinition).nbtTag)
+            if (content.blockDefinition is NbtBlockDefinitionRegistry.NbtBlockDefinition) {
+                val nbtTag = (content.blockDefinition as NbtBlockDefinitionRegistry.NbtBlockDefinition).nbtTag
+
+                if (nbtTag != NbtMap.EMPTY) {
+                    val sortedTag = TreeMap(nbtTag)
+                    val sortedStates = TreeMap(nbtTag.getCompound("states"))
+                    val statesBuilder = NbtMap.builder()
+                    statesBuilder.putAll(sortedStates)
+
+                    sortedTag["states"] = statesBuilder.build()
+
+                    val tagBuilder = NbtMap.builder()
+                    tagBuilder.putAll(sortedTag)
+
+                    blockStateBase64 = ExtractionUtil.nbtToBase64(tagBuilder.build())
+                }
             }
 
             var damage: Int? = content.damage

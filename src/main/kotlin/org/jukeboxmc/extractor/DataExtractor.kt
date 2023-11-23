@@ -10,9 +10,9 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioDatagramChannel
-import org.cloudburstmc.nbt.NBTInputStream
 import org.cloudburstmc.nbt.NbtMap
 import org.cloudburstmc.nbt.NbtType
+import org.cloudburstmc.nbt.NbtUtils
 import org.cloudburstmc.netty.channel.raknet.RakChannelFactory
 import org.cloudburstmc.netty.channel.raknet.config.RakChannelOption
 import org.cloudburstmc.protocol.bedrock.BedrockPeer
@@ -28,14 +28,12 @@ import org.jukeboxmc.extractor.session.ProxiedBedrockClientSession
 import org.jukeboxmc.extractor.session.ProxiedBedrockServerSession
 import org.jukeboxmc.extractor.session.UpstreamPacketHandler
 import org.jukeboxmc.extractor.util.NbtBlockDefinitionRegistry
-import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.InetSocketAddress
 import java.security.KeyPair
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.zip.GZIPInputStream
 
 /**
  * @author Kaooot
@@ -105,25 +103,21 @@ class DataExtractor {
             println("Authentication with the specified refresh token was successful")
         }
 
-        val stream = this.javaClass.classLoader.getResourceAsStream("block_palette.nbt")
+        val resourceAsStream = this.javaClass.classLoader.getResourceAsStream("block_palette.nbt")
 
-        if (stream == null) {
+        if (resourceAsStream == null) {
             println("could not find block palette resource")
 
             return
         }
 
-        stream.use { inputStream ->
-            GZIPInputStream(inputStream).use { gzipStream ->
-                DataInputStream(gzipStream).use {
-                    NBTInputStream(it).use { stream ->
-                        val nbtMap = stream.readTag() as NbtMap
-                        val blocks = nbtMap.getList("blocks", NbtType.COMPOUND)
+        resourceAsStream.use {
+            NbtUtils.createGZIPReader(it).use { stream ->
+                val nbtMap = stream.readTag() as NbtMap
+                val blocks = nbtMap.getList("blocks", NbtType.COMPOUND)
 
-                        this.blockDefinitionRegistry = NbtBlockDefinitionRegistry(blocks, false)
-                        this.blockDefinitionHashedRegistry = NbtBlockDefinitionRegistry(blocks, true)
-                    }
-                }
+                this.blockDefinitionRegistry = NbtBlockDefinitionRegistry(blocks, false)
+                this.blockDefinitionHashedRegistry = NbtBlockDefinitionRegistry(blocks, true)
             }
         }
 

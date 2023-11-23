@@ -3,8 +3,6 @@
  */
 package org.jukeboxmc.extractor.util
 
-import kotlin.experimental.and
-
 /**
  * @author Kaooot
  * @version 1.0
@@ -12,8 +10,8 @@ import kotlin.experimental.and
 class BlockPaletteHashUtil {
 
     companion object {
-        private val fnv1_32_init: Long = 0x811c9dc5
-        private val fnv1_32_prime: Long = 0x01000193
+        private const val fnv1_32_init: Int = 0x811c9dc5.toInt()
+        private const val fnv1_32_prime: Int = 0x01000193
 
         /**
          * Creates a hashed runtime identifier from the raw nbt byte data. Hashed block runtime ids are persistent
@@ -22,14 +20,14 @@ class BlockPaletteHashUtil {
          * @return a hashed block runtime id
          */
         fun fnv1a_32(data: ByteArray): Int {
-            var hash: Long = this.fnv1_32_init
+            var hash: Int = this.fnv1_32_init
 
             for (datum in data) {
-                hash = hash.xor(datum.and(0xff.toByte()).toLong())
+                hash = hash xor (datum.toInt() and 0xff)
                 hash *= this.fnv1_32_prime
             }
 
-            return hash.toInt()
+            return hash
         }
     }
 }
