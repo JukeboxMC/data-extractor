@@ -62,8 +62,13 @@ class RecipeUtil {
 
                 var entryShape: Array<String>? = null
                 var input: Any? = null
+                var width: Int? = null
+                var height: Int? = null
 
                 if (recipe is ShapedRecipeData) {
+                    width = recipe.width
+                    height = recipe.height
+                    uuid = recipe.uuid
                     netId = recipe.netId
 
                     var charCounter = 0
@@ -113,6 +118,7 @@ class RecipeUtil {
                 }
 
                 if (recipe is ShapelessRecipeData) {
+                    uuid = recipe.uuid
                     netId = recipe.netId
                     input = this.writeRecipeItemDescriptors(recipe.ingredients, dataExtractor)
                 }
@@ -148,7 +154,7 @@ class RecipeUtil {
                     template = this.fromNetwork(recipe.template, dataExtractor)
                 }
 
-                craftingData.add(CraftingDataEntry(id, type, input, output, entryShape, block, uuid, netId, priority, base, addition, template, result))
+                craftingData.add(CraftingDataEntry(id, type, input, output, entryShape, block, uuid, netId, priority, base, addition, template, result, width, height))
             }
 
             for (potionMix in packet.potionMixData) {
@@ -273,7 +279,9 @@ class RecipeUtil {
         val base: Any?,
         val addition: Any?,
         val template: Any?,
-        val result: Any?
+        val result: Any?,
+        val width: Int?,
+        val height: Int?
     )
 
     data class PotionMixDataEntry(val inputId: String, val inputMeta: Int, val reagentId: String, val reagentMeta: Int, val outputId: String, val outputMeta: Int)
