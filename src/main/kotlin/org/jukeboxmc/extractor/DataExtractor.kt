@@ -113,7 +113,7 @@ class DataExtractor {
             return
         }
 
-        this.javaClass.classLoader.getResourceAsStream("block_palette.nbt").use { inputStream ->
+        stream.use { inputStream ->
             GZIPInputStream(inputStream).use { gzipStream ->
                 DataInputStream(gzipStream).use {
                     NBTInputStream(it).use { stream ->
