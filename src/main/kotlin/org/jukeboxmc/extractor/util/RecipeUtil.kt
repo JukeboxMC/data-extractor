@@ -31,14 +31,26 @@ class RecipeUtil {
 
                 var block: String? = null
                 var uuid: UUID? = null
+                var netId: Int? = null
+                var id: String? = null
 
                 if (recipe is TaggedCraftingData) {
                     block = recipe.tag
-                } else if (recipe is UniqueCraftingData) {
+                }
+                if (recipe is UniqueCraftingData) {
                     uuid = recipe.uuid
+
+                    if (recipe is MultiRecipeData) {
+                        netId = recipe.netId
+                    }
+                }
+                if (recipe is NetworkRecipeData) {
+                    netId = recipe.netId
+                }
+                if (recipe is IdentifiableRecipeData) {
+                    id = recipe.id
                 }
 
-                var id: String? = null
                 var priority: Int? = null
                 var output: Any? = null
 
@@ -52,6 +64,8 @@ class RecipeUtil {
                 var input: Any? = null
 
                 if (recipe is ShapedRecipeData) {
+                    netId = recipe.netId
+
                     var charCounter = 0
 
                     val inputs = recipe.ingredients
@@ -99,6 +113,7 @@ class RecipeUtil {
                 }
 
                 if (recipe is ShapelessRecipeData) {
+                    netId = recipe.netId
                     input = this.writeRecipeItemDescriptors(recipe.ingredients, dataExtractor)
                 }
 
@@ -115,7 +130,25 @@ class RecipeUtil {
                     output = this.itemFromNetwork(recipe.result)
                 }
 
-                craftingData.add(CraftingDataEntry(id, type, input, output, entryShape, block, uuid, priority))
+                var base: Any? = null
+                var addition: Any? = null
+                var template: Any? = null
+                var result: Any? = null
+
+                if (recipe is SmithingTransformRecipeData) {
+                    base = this.fromNetwork(recipe.base, dataExtractor)
+                    addition = this.fromNetwork(recipe.addition, dataExtractor)
+                    template = this.fromNetwork(recipe.template, dataExtractor)
+                    result = this.itemFromNetwork(recipe.result)
+                }
+
+                if (recipe is SmithingTrimRecipeData) {
+                    base = this.fromNetwork(recipe.base, dataExtractor)
+                    addition = this.fromNetwork(recipe.addition, dataExtractor)
+                    template = this.fromNetwork(recipe.template, dataExtractor)
+                }
+
+                craftingData.add(CraftingDataEntry(id, type, input, output, entryShape, block, uuid, netId, priority, base, addition, template, result))
             }
 
             for (potionMix in packet.potionMixData) {
@@ -227,7 +260,21 @@ class RecipeUtil {
 
     data class Recipes(val version: Int, val recipes: List<CraftingDataEntry>, val potionMixes: List<PotionMixDataEntry>, val containerMixes: List<ContainerMixDataEntry>)
 
-    data class CraftingDataEntry(val id: String?, val type: Int, val input: Any?, val output: Any?, val shape: Array<String>?, val block: String?, val uuid: UUID?, val priority: Int?)
+    data class CraftingDataEntry(
+        val id: String?,
+        val type: Int,
+        val input: Any?,
+        val output: Any?,
+        val shape: Array<String>?,
+        val block: String?,
+        val uuid: UUID?,
+        val netId: Int?,
+        val priority: Int?,
+        val base: Any?,
+        val addition: Any?,
+        val template: Any?,
+        val result: Any?
+    )
 
     data class PotionMixDataEntry(val inputId: String, val inputMeta: Int, val reagentId: String, val reagentMeta: Int, val outputId: String, val outputMeta: Int)
 
