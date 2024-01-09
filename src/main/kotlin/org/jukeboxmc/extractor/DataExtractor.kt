@@ -86,6 +86,8 @@ class DataExtractor {
         this.proxyAddress = InetSocketAddress(config.proxyAddress, config.proxyPort)
         this.address = InetSocketAddress(config.targetAddress, config.targetPort)
 
+        println("Using version ${this.codec.minecraftVersion} (protocol v${this.codec.protocolVersion}, rakNet v${this.codec.raknetProtocolVersion})")
+
         if (args.isEmpty()) {
             println("Paste the following link (https://microsoft.com/link) in your browser and enter the code: ${this.msaAuth.generateAuthCode()}")
 
