@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Kaooot
+ * Copyright (c) 2024, Kaooot
  */
 package org.jukeboxmc.extractor.session
 
