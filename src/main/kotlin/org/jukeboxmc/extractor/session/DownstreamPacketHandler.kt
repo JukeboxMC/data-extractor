@@ -30,10 +30,14 @@ class DownstreamPacketHandler(private val dataExtractor: DataExtractor) : Bedroc
     override fun handle(packet: NetworkSettingsPacket): PacketSignal {
         this.dataExtractor.serverSession().sendPacketImmediately(packet)
 
-        this.dataExtractor.clientSession().setCompression(packet.compressionAlgorithm)
-        this.dataExtractor.serverSession().setCompression(packet.compressionAlgorithm)
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                dataExtractor.serverSession().setCompression(packet.compressionAlgorithm)
+                dataExtractor.clientSession().setCompression(packet.compressionAlgorithm)
 
-        println("The compression was set to ${packet.compressionAlgorithm}")
+                println("The compression was set to ${packet.compressionAlgorithm}")
+            }
+        }, 60)
 
         return PacketSignal.HANDLED
     }
