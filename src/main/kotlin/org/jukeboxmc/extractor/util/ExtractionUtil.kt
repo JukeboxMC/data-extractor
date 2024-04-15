@@ -22,7 +22,7 @@ class ExtractionUtil {
          */
         fun writeNBT(nbtMap: NbtMap, file: File) {
             FileOutputStream(file).use { stream ->
-                NbtUtils.createNetworkWriter(stream).use {
+                NbtUtils.createGZIPWriter(stream).use {
                     it.writeTag(nbtMap)
                 }
             }
