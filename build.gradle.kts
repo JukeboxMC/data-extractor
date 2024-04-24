@@ -14,6 +14,6 @@ repositories {
 dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:9.10.1")
     implementation("com.google.code.gson:gson:2.9.0")
-    implementation("org.cloudburstmc.protocol:bedrock-codec:3.0.0.Beta1-SNAPSHOT")
-    implementation("org.cloudburstmc.protocol:bedrock-connection:3.0.0.Beta1-SNAPSHOT")
+    implementation("org.cloudburstmc.protocol:bedrock-codec:3.0.0.Beta2-SNAPSHOT")
+    implementation("org.cloudburstmc.protocol:bedrock-connection:3.0.0.Beta2-SNAPSHOT")
 }

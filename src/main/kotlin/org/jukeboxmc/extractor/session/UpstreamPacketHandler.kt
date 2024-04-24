@@ -3,6 +3,7 @@
  */
 package org.jukeboxmc.extractor.session
 
+import org.cloudburstmc.protocol.bedrock.data.EncodingSettings
 import org.cloudburstmc.protocol.bedrock.packet.BedrockPacketHandler
 import org.cloudburstmc.protocol.bedrock.packet.LoginPacket
 import org.cloudburstmc.protocol.bedrock.packet.PlayStatusPacket
@@ -38,6 +39,18 @@ class UpstreamPacketHandler(private val dataExtractor: DataExtractor) : BedrockP
 
             return PacketSignal.HANDLED
         }
+
+        val encodingSettings = EncodingSettings.builder()
+            .maxListSize(Int.MAX_VALUE)
+            .maxByteArraySize(Int.MAX_VALUE)
+            .maxNetworkNBTSize(Int.MAX_VALUE)
+            .maxItemNBTSize(Int.MAX_VALUE)
+            .maxStringLength(Int.MAX_VALUE)
+            .build()
+        this.dataExtractor.clientSession().peer.codecHelper.encodingSettings = encodingSettings
+        this.dataExtractor.serverSession().peer.codecHelper.encodingSettings = encodingSettings
+
+        println("set encoding settings")
 
         return PacketSignal.UNHANDLED
     }

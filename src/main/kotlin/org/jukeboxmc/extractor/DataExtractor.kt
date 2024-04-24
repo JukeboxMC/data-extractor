@@ -18,7 +18,8 @@ import org.cloudburstmc.netty.channel.raknet.config.RakChannelOption
 import org.cloudburstmc.protocol.bedrock.BedrockPeer
 import org.cloudburstmc.protocol.bedrock.BedrockPong
 import org.cloudburstmc.protocol.bedrock.codec.BedrockCodec
-import org.cloudburstmc.protocol.bedrock.codec.v662.Bedrock_v662
+import org.cloudburstmc.protocol.bedrock.codec.v671.Bedrock_v671
+import org.cloudburstmc.protocol.bedrock.data.EncodingSettings
 import org.cloudburstmc.protocol.bedrock.netty.initializer.BedrockChannelInitializer
 import org.cloudburstmc.protocol.bedrock.util.EncryptionUtils
 import org.jukeboxmc.extractor.auth.MsaAuth
@@ -41,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class DataExtractor {
 
-    private val codec = Bedrock_v662.CODEC
+    private val codec = Bedrock_v671.CODEC
     private val msaAuth = MsaAuth()
     private val running = AtomicBoolean(true)
     private val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
@@ -147,6 +148,13 @@ class DataExtractor {
                     val session = ProxiedBedrockServerSession(this@DataExtractor, peer, subClientId)
 
                     synchronized(this@DataExtractor) {
+                        session.peer.codecHelper.encodingSettings = EncodingSettings.builder()
+                            .maxListSize(Int.MAX_VALUE)
+                            .maxByteArraySize(Int.MAX_VALUE)
+                            .maxNetworkNBTSize(Int.MAX_VALUE)
+                            .maxItemNBTSize(Int.MAX_VALUE)
+                            .maxStringLength(Int.MAX_VALUE)
+                            .build()
                         this@DataExtractor.serverSession = session
                     }
 
