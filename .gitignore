@@ -52,3 +52,4 @@ src/main/resources/extracted/entity_identifiers/*.dat
 src/main/resources/extracted/creative_items/*.json
 src/main/resources/extracted/item_palette/*.json
 src/main/resources/extracted/recipes/*.json
+src/main/resources/extracted/trim_data/*.json

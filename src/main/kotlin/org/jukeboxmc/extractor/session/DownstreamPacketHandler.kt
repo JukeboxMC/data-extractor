@@ -7,6 +7,8 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.nimbusds.jwt.SignedJWT
 import org.cloudburstmc.nbt.NbtMap
+import org.cloudburstmc.protocol.bedrock.data.TrimMaterial
+import org.cloudburstmc.protocol.bedrock.data.TrimPattern
 import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition
 import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition
 import org.cloudburstmc.protocol.bedrock.packet.*
@@ -176,6 +178,17 @@ class DownstreamPacketHandler(private val dataExtractor: DataExtractor) : Bedroc
 
         return PacketSignal.UNHANDLED
     }
+
+    override fun handle(packet: TrimDataPacket): PacketSignal {
+        val trimData = TrimData(packet.patterns,packet.materials)
+
+        ExtractionUtil.writeJson(this.dataExtractor.gson().toJson(trimData), File("src/main/resources/extracted/trim_data/trim_data.${this.dataExtractor.codec().minecraftVersion.replace(".", "_")}.json"))
+
+        println("extracted trim data")
+        return super.handle(packet)
+    }
+
+    data class TrimData(val patterns: List<TrimPattern>, val materials: List<TrimMaterial>)
 
     data class CreativeContents(val items: List<CreativeItem>)
 
