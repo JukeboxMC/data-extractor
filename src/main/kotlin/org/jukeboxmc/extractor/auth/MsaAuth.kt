@@ -7,7 +7,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import java.io.ByteArrayOutputStream
 import java.net.URI
-import java.net.URL
 import java.net.URLEncoder
 import java.security.KeyPair
 import java.security.interfaces.ECPublicKey
@@ -21,11 +20,11 @@ import javax.net.ssl.HttpsURLConnection
 class MsaAuth {
 
     private val clientId = "0000000048183522"
-    private val oAuth20ConnectUrl = URI.create("https://login.live.com/oauth20_connect.srf").toURL()
-    private val oAuth20TokenUrl = URI.create("https://login.live.com/oauth20_token.srf").toURL()
-    private val xboxLiveSisuUrl = URI.create("https://sisu.xboxlive.com/authorize").toURL()
-    private val xboxLiveDeviceAuthUrl = URI.create("https://device.auth.xboxlive.com/device/authenticate").toURL()
-    private val minecraftMultiplayerUrl = URI.create("https://multiplayer.minecraft.net/authentication").toURL()
+    private val oAuth20ConnectUrl = URI.create("https://login.live.com/oauth20_connect.srf")
+    private val oAuth20TokenUrl = URI.create("https://login.live.com/oauth20_token.srf")
+    private val xboxLiveSisuUrl = URI.create("https://sisu.xboxlive.com/authorize")
+    private val xboxLiveDeviceAuthUrl = URI.create("https://device.auth.xboxlive.com/device/authenticate")
+    private val minecraftMultiplayerUrl = URI.create("https://multiplayer.minecraft.net/authentication")
 
     private var deviceCode: String? = null
     private var accessToken: String? = null
@@ -229,10 +228,10 @@ class MsaAuth {
         return this.deviceToken
     }
 
-    private fun httpsRequest(url: URL, params: Map<String, String?>): JsonObject? {
+    private fun httpsRequest(uri: URI, params: Map<String, String?>): JsonObject? {
         var jsonObject: JsonObject? = null
 
-        val connection = url.openConnection() as HttpsURLConnection
+        val connection = uri.toURL().openConnection() as HttpsURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
         connection.doOutput = true
@@ -269,10 +268,10 @@ class MsaAuth {
         return jsonObject
     }
 
-    private fun httpsRequest(url: URL, params: Map<String, String?>, data: JsonObject): JsonObject? {
+    private fun httpsRequest(uri: URI, params: Map<String, String?>, data: JsonObject): JsonObject? {
         var jsonObject: JsonObject? = null
 
-        val connection = url.openConnection() as HttpsURLConnection
+        val connection = uri.toURL().openConnection() as HttpsURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json")
 
