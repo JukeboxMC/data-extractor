@@ -18,7 +18,7 @@ import org.cloudburstmc.netty.channel.raknet.config.RakChannelOption
 import org.cloudburstmc.protocol.bedrock.BedrockPeer
 import org.cloudburstmc.protocol.bedrock.BedrockPong
 import org.cloudburstmc.protocol.bedrock.codec.BedrockCodec
-import org.cloudburstmc.protocol.bedrock.codec.v686.Bedrock_v686
+import org.cloudburstmc.protocol.bedrock.codec.v712.Bedrock_v712
 import org.cloudburstmc.protocol.bedrock.data.EncodingSettings
 import org.cloudburstmc.protocol.bedrock.netty.initializer.BedrockChannelInitializer
 import org.cloudburstmc.protocol.bedrock.util.EncryptionUtils
@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class DataExtractor {
 
-    private val codec = Bedrock_v686.CODEC
+    private val codec = Bedrock_v712.CODEC
     private val msaAuth = MsaAuth()
     private val running = AtomicBoolean(true)
     private val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
